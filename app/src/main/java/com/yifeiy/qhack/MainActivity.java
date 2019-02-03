@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -36,6 +37,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     LinearLayout entry_container;
+    static String newFile;
+    static boolean makeFile = false;
     protected static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     public Uri imageUri;
     static ImageView receipt_view;
@@ -55,15 +58,34 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-        ArrayList<Entry> EntriesAL = new ArrayList<>();
 
 
         entry_container = findViewById(R.id.entry_container);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        if (makeFile){
+            String[] entries = file_replacement.split("!");
+            int currentIndex = 0;
+            for (int j = entries.length;currentIndex < entries.length;) {
+                for (String entry : entries) {
+                    String filename = "entries_file" + Integer.toString(j);
+                    File file = new File(this.getFilesDir(), filename);
+                    FileOutputStream outputStream;
+                    if (file.exists()) {
+                        j++;
+                    }
+                    try {
+                        outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                        outputStream.write(entries[currentIndex].getBytes());
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
 
         file_replacement = readFiles();
-        String file_replacement = "iPhone#02/Jun/2019#01/Dec/2019#0#http://i5.walmartimages.com/asr/c7447d99-c90c-4039-b098-7ec0949e85ea_1.d6bf6d15f16849b61e85deeac75035c7.jpeg!Tomato Pretz#03/Jun/2019#01/Jan/2020#0#http://i5.walmartimages.ca/images/Large/087/3v2/999999-999999-6289150873v2.jpg!K cups#15/Jan/2018#20/Feb/2019#1#http://i5.walmartimages.ca/images/Large/960/023/999999-UPC_762111960023.jpg";
 
         String[] entries = file_replacement.split("!");
 
@@ -72,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         for (String entry : entries) {
             Log.v("splits", entry);
             final Entry e = new Entry(entry.split("#"));
-            EntriesAL.add(e);
             final LinearLayout l = new LinearLayout(this);
             l.setLayoutParams(lp);
             l.setOrientation(LinearLayout.HORIZONTAL);
@@ -125,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             }
             try {
                 Scanner sc = new Scanner(file);
-                filesContent.add(sc.nextLine());
+                filesContent.add(sc.next());
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -148,6 +169,10 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        if (s.length() == 0){
+            s = "iPhone#02/Jun/2019#http://i5.walmartimages.com/asr/c7447d99-c90c-4039-b098-7ec0949e85ea_1.d6bf6d15f16849b61e85deeac75035c7.jpeg#012341242123#999.99!Tomato Pretz#03/Jun/2019#http://i5.walmartimages.ca/images/Large/087/3v2/999999-999999-6289150873v2.jpg#123123123123#2.59!K cups#15/Jan/2018#http://i5.walmartimages.ca/images/Large/960/023/999999-UPC_762111960023.jpg#102938471823#12.29";
         }
         return s;
     }
@@ -183,8 +208,10 @@ public class MainActivity extends AppCompatActivity {
         }
         return directory.getAbsolutePath();
     }
-    public static void feedResponse(){
 
+    public static void feedResponse(String s){
+        newFile = s;
+        makeFile = true;
     }
 }
 
