@@ -9,7 +9,6 @@ public class Entry {
     public String img_addr;
     public String urc;
     public String price;
-
     public Entry(String [] args){
         name = args[0];
         purchase_date = args[1];
@@ -18,5 +17,8 @@ public class Entry {
         price = args[4];
     }
 
-
+    @Override
+    public String toString() {
+        return "Product: " + name + "\nPurchase_date: " + purchase_date + "\nURC: " + urc + "\nPrice: " + price;
+    }
 }

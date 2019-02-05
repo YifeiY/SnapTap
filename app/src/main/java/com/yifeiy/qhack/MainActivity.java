@@ -59,37 +59,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        entry_container = findViewById(R.id.entry_container);
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        if (makeFile){
-            String[] entries = file_replacement.split("!");
-            int currentIndex = 0;
-            for (int j = entries.length;currentIndex < entries.length;) {
-                for (String entry : entries) {
-                    String filename = "entries_file" + Integer.toString(j);
-                    File file = new File(this.getFilesDir(), filename);
-                    FileOutputStream outputStream;
-                    if (file.exists()) {
-                        j++;
-                    }
-                    try {
-                        outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                        outputStream.write(entries[currentIndex].getBytes());
-                        outputStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
         file_replacement = readFiles();
 
         String[] entries = file_replacement.split("!");
 
         final UrlHandler urlHandler = new UrlHandler();
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        entry_container = findViewById(R.id.entry_container);
 
         for (String entry : entries) {
             Log.v("splits", entry);
@@ -133,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             entry_container.addView(l);
 
         }
+
+
     }
 
 
@@ -141,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0;true;i++){
             String filename = "entries_file" + Integer.toString(i);
             File file = new File(this.getFilesDir(), filename);
-            if (!file.exists()) {
+            if (!(file.exists()|i>100)) {
                 break;
             }
             try {
@@ -209,9 +187,68 @@ public class MainActivity extends AppCompatActivity {
         return directory.getAbsolutePath();
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if (makeFile) {
+            String[] entries = "Always Pad#03/Feb/2019#https://i5.walmartimages.ca/images/Large/469/447/6000198469447.jpg#003700030495#5.47!Always Pad#03/Feb/2019#https://i5.walmartimages.ca/images/Large/469/447/6000198469447.jpg#003700030495#5.47!FerreroChocolate Collection#03/Feb/2019#https://i5.walmartimages.ca/images/Large/404/092/6000199404092.jpg#007874212365#13.47!FerreroChocolate Collection#03/Feb/2019#https://i5.walmartimages.ca/images/Large/404/092/6000199404092.jpg#007874212365#13.47".split("!");
+            final UrlHandler urlHandler = new UrlHandler();
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+            for (String entry : entries) {
+                Log.v("splits", entry);
+                final Entry e = new Entry(entry.split("#"));
+                final LinearLayout l = new LinearLayout(this);
+                l.setLayoutParams(lp);
+                l.setOrientation(LinearLayout.HORIZONTAL);
+
+                ImageView img = new ImageView(this);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveToInternalStorage(urlHandler.getBitmapFromURL(e.img_addr), e.name);
+                    }
+                }).start();
+                ContextWrapper cw = new ContextWrapper(this);
+                File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+                File f = new File(directory, e.name);
+                try {
+                    Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+                    img.setImageBitmap(b);
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+                img.setLayoutParams(getWeightParams(3f));
+
+                TextView t = new TextView(this);
+                t.setText(e.toString());
+                t.setLayoutParams(getWeightParams(1f));
+                t.setPadding(50, 100, 50, 100);
+
+                l.addView(img);
+                l.addView(t);
+
+                l.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        l.setVisibility(View.GONE);
+                    }
+                });
+                entry_container.addView(l);
+
+            }
+        }
+        makeFile = false;
+
+    }
     public static void feedResponse(String s){
         newFile = s;
         makeFile = true;
+        update();
+    }
+
+    public static void update(){
+
     }
 }
 

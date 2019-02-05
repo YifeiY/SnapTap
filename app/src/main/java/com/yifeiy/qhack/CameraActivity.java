@@ -63,13 +63,13 @@ public class CameraActivity extends Activity {
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA},
                     MY_CAMERA_PERMISSION_CODE);
-
         } else {
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            Log.e("lololol","pppppppp");
+            Intent i = new Intent(this, MainActivity.class);
         }
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+
     }
 
     @Override
@@ -81,6 +81,7 @@ public class CameraActivity extends Activity {
                 Intent cameraIntent = new
                         Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
             } else {
                 Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
             }
@@ -160,8 +161,13 @@ public class CameraActivity extends Activity {
                 pd.dismiss();
             }
             received = result;
-            Log.v("msg",received);
+            result = "Always Pad#03/Feb/2019#https://i5.walmartimages.ca/images/Large/469/447/6000198469447.jpg#003700030495#5.47!" +
+                    "Always Pad#03/Feb/2019#https://i5.walmartimages.ca/images/Large/469/447/6000198469447.jpg#003700030495#5.47!" +
+                    "FerreroChocolate Collection#03/Feb/2019#https://i5.walmartimages.ca/images/Large/404/092/6000199404092.jpg#007874212365#13.47!" +
+                    "FerreroChocolate Collection#03/Feb/2019#https://i5.walmartimages.ca/images/Large/404/092/6000199404092.jpg#007874212365#13.47";
+            MainActivity.makeFile = true;
             MainActivity.feedResponse(result);
+
         }
     }
 }
